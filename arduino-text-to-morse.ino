@@ -1,8 +1,16 @@
-#define OUTPUT_PIN 2
+#define BUZZER 2
+#define BUFFER_SIZE 2048
+
+int buffer[BUFFER_SIZE];
+int bufferWriter;
+int bufferReader;
 
 void setup() {
-  pinMode(OUTPUT_PIN, OUTPUT);
-  digitalWrite(OUTPUT_PIN, LOW);
+  pinMode(BUZZER, OUTPUT);
+  noTone(BUZZER);
+
+	int bufferWriter = 0;
+	int bufferReader = 0;
 
   Serial.begin(9600);
 }
@@ -15,12 +23,17 @@ void serialEvent() {
     // get the new byte:
     char state = (char)Serial.read();
     if (state == 'g') {
-      if (digitalRead(OUTPUT_PIN) == HIGH) {
-        digitalWrite(OUTPUT_PIN, LOW);
+      if (digitalRead(BUZZER) != LOW) {
+        noTone(BUZZER);
       } 
       else {
-        digitalWrite(OUTPUT_PIN, HIGH);
+        tone(BUZZER, 600);
       }
     }
   }
+}
+
+// Resets the buffer by copying the contents betweem
+// bufferReader and Buffer Writer
+void bufferReset() {
 }

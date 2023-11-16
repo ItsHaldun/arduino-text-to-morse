@@ -36,11 +36,22 @@ class serialArduino:
   
   
   def read(self):
+    # Connection Check
+    if self.serial is None:
+      raise Exception("PORT ERROR: Serial is not connected to a port")
+    elif self.serial.is_open == False:
+      raise Exception("PORT ERROR: Serial connection is not open")
+    
     return self.serial.readline()
   
   
   # Writes a given message to arduino serial as a line
   def write(self, msg: Union[str, int, float]):
+    # Connection Check
+    if self.serial is None:
+      raise Exception("PORT ERROR: Serial is not connected to a port")
+    elif self.serial.is_open == False:
+      raise Exception("PORT ERROR: Serial connection is not open")
     self.serial.write(b'{msg}\n')
   
   

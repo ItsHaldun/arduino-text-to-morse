@@ -109,18 +109,3 @@ class serialArduino:
     else:
       raise Exception("PORT ERROR: Port can't be set because serial port is not initialized!")
 
-
-
-
-if __name__ == "__main__":
-  arduino = serialArduino()
-  arduino.initialize('/dev/cu.usbserial-120')
-  arduino.write('g')
-  
-  i = 0
-  while (i<10):
-    arduino.write('g')
-    sleep(1)
-    i+=1
-  
-  arduino.close()

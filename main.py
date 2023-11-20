@@ -3,6 +3,8 @@ import yaml
 
 # TODO:
 # Convert to bits for more efficient transfer
+# Test buffer reset on arduino
+# Speed control using potentiometer
 
 # Load Lookup Table
 with open('morse_code.yml', 'r') as file:

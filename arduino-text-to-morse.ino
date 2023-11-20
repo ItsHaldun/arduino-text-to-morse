@@ -53,8 +53,6 @@ void serialEvent() {
     // get the new byte:
     char state = (char)Serial.read();
 
-		Serial.println(state);
-
 		// Check if valid character
 		if (state=='.' || state=='_' || state=='i' || state=='j' || state==' ') {
 			if (bufferWriter >= BUFFER_SIZE) {
@@ -115,6 +113,6 @@ float char_to_time(char c) {
 	default:
 		break;
 	}
-	// Return it in miliseconds
+	// Return it (in miliseconds)
 	return time;
 }

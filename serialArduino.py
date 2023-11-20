@@ -15,10 +15,16 @@ from time import sleep
 # Arduino being able to notice and request lost packages
 
 class serialArduino:
-  def __init__(self):
+  def __init__(self, connect_mode='Auto', encoding='UTF-8'):
     self.available_ports = list_ports.comports()
+    self.connect_mode = connect_mode
+    self.encoding = encoding
     self.serial = None
-    print(f"\nAvailable devices:\n{tabulate(self.ports, headers=['Name','Desc','Hwid'], tablefmt='orgtbl')}\n")
+    
+    if self.available_ports == []:
+      raise Exception("PORT ERROR: No available ports found!")
+    else:
+      print(f"\nAvailable devices:\n{tabulate(self.available_ports, headers=['Name','Desc','Hwid'], tablefmt='orgtbl')}\n")
   
   
   def initialize(self, port:str, baudrate:int=9600, timeout:float=1.) -> None:
@@ -52,7 +58,7 @@ class serialArduino:
       raise Exception("PORT ERROR: Serial is not connected to a port")
     elif self.serial.is_open == False:
       raise Exception("PORT ERROR: Serial connection is not open")
-    self.serial.write(b'{msg}\n')
+    self.serial.write(f'{msg}\n'.encode(encoding=self.encoding))
   
   
   def close(self) -> None:

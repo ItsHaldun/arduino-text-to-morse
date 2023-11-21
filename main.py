@@ -8,17 +8,14 @@ import morse
 # MILIS INSTEAD OF DELAY (DELAY IS BLOCKING)
 # Extra logic for buffer reset?
 
-# Speed Control (Maybe put on a potentiometer?)
-WPM = 1										# Words per minute (PARIS Standard)
-t_unit = 60 / (50 * WPM)	# Seconds per unit
-
 
 arduino = serialArduino()
-arduino.initialize('/dev/cu.usbserial-120')
+arduino.initialize('/dev/cu.usbserial-140')
 
 
 exitRecieved = False
 exitCode = 'exit'
+
 print(f"Press enter to send morse code. Type '{exitCode}' to exit.")
 while not exitRecieved:
   msg = input("Enter: ")

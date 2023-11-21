@@ -24,6 +24,8 @@ float t_unit = 60000.0/(50.0*WPM);	// Miliseconds per unit
 char buffer[BUFFER_SIZE];
 int bufferWriter;
 int bufferReader;
+unsigned long interval = 0;
+unsigned long previousTime = 0;
 
 
 void setup() {
@@ -50,13 +52,31 @@ void loop() {
 	WPM = map(speedRead, 0, 1023, MIN_SPEED, MAX_SPEED);
 	t_unit = 60000.0/(50.0*WPM);
 
-	// Read the buffer if there is something to read
-	if (bufferReader<bufferWriter) {
-		char c = buffer[bufferReader];
-		float time = char_to_time(c);
-		send_code(time);
-		bufferReader++;
-	}
+	// Check for interval
+	unsigned long currentTime = millis();
+
+	if (currentTime - previousTime >= interval) {
+		previousTime = currentTime;
+
+		// Read the buffer if there is something to read
+		if (bufferReader<bufferWriter) {
+			char c = buffer[bufferReader];
+			float time = char_to_time(c);
+			bufferReader++;
+
+			if (time>0) {
+				tone(BUZZER, FREQUENCY);
+				digitalWrite(LED_BUILTIN, HIGH);
+				
+				interval = time + millis() - previousTime;
+			}
+			else {
+				noTone(BUZZER);
+				digitalWrite(LED_BUILTIN, LOW);
+				interval = -time + millis() - previousTime;
+			}
+		}
+	}	
 }
 
 void serialEvent() {
@@ -65,7 +85,7 @@ void serialEvent() {
     char state = (char)Serial.read();
 
 		// Check if valid character
-		if (state=='.' || state=='_' || state=='i' || state=='j' || state==' ') {
+		if (state=='.' || state=='_' || state=='i' || state=='j' || state=='/') {
 			if (bufferWriter >= BUFFER_SIZE) {
 				bufferReset();
 			}

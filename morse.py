@@ -26,12 +26,13 @@ def text_to_morse(text: Union[str, int], strict=False) -> str:
   for c in text:
     if c not in keys:
       if c == ' ':
-        morse += c
+        morse += '/ '
       else:
         if strict:
           raise KeyError(f"{c} is not in morse table")
     else:
       morse += conversion_table[c]
+      morse += ' '
   return morse
 
 def text_to_farnsworth(text: Union[str, int], strict=False) -> str:

@@ -1,22 +1,12 @@
 from serialArduino import serialArduino
-import yaml
+import morse
 
 # TODO:
 # Convert to bits for more efficient transfer
 # Test buffer reset on arduino
-# Speed control using potentiometer
-
-# Load Lookup Table
-with open('morse_code.yml', 'r') as file:
-  conversion_table = yaml.safe_load(file)
-
-
-# Farnsworth Timings
-dit = '.'		# 1 unit
-dah = '_'		# 3 units
-intra = 'i'	# 1 unit
-inter = 'j'	# 3 units
-space = ' '	# 7 units
+# Speed control using potentiometer (Use INTERRUPTS!)
+# MILIS INSTEAD OF DELAY (DELAY IS BLOCKING)
+# Extra logic for buffer reset?
 
 # Speed Control (Maybe put on a potentiometer?)
 WPM = 1										# Words per minute (PARIS Standard)
@@ -25,5 +15,25 @@ t_unit = 60 / (50 * WPM)	# Seconds per unit
 
 arduino = serialArduino()
 arduino.initialize('/dev/cu.usbserial-120')
-arduino.close()
 
+
+exitRecieved = False
+exitCode = 'exit'
+print(f"Press enter to send morse code. Type '{exitCode}' to exit.")
+while not exitRecieved:
+  msg = input("Enter: ")
+  
+  if msg == exitCode:
+    confirm =  ''
+    while confirm not in ['y', 'n']:
+      confirm = input("Do you want to exit (y/n): ")
+    if confirm == 'y':
+      exitRecieved = True
+      continue
+  
+  print(f"Morse: {morse.text_to_morse(msg)}")
+  morse_msg = morse.text_to_farnsworth(msg)
+  print(f"DEBUG: {morse_msg}")
+  arduino.write(morse_msg)
+
+arduino.close()

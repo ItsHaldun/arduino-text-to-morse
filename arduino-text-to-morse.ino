@@ -1,7 +1,7 @@
 // Pinouts
-#define BUZZER 2					// Buzzer output signal pin
+#define BUZZER 2						// Buzzer output signal pin
 #define LED 13
-#define SPEED_PIN 0				// Analog Potentiometer input	
+#define SPEED_PIN A0		// Analog Potentiometer input	
 
 // Farnsworth Timings
 #define dit 1 		// Units
@@ -10,11 +10,15 @@
 #define inter 3		// 3 units
 #define space 7		// 7 units
 
-// Speed Control (Maybe put on a potentiometer?)
-#define WPM 10.0									// Words per minute (PARIS Standard)
-#define t_unit 60000.0/(50.0*WPM)	// Miliseconds per unit
+// Speed Control
+#define MIN_SPEED 1
+#define MAX_SPEED 50
+float WPM = 1.0;										// Words per minute (PARIS standard)
+float t_unit = 60000.0/(50.0*WPM);	// Miliseconds per unit
+
 
 #define BUFFER_SIZE 1024
+#define BAUDRATE 9600
 #define FREQUENCY 600
 
 char buffer[BUFFER_SIZE];
@@ -23,6 +27,9 @@ int bufferReader;
 
 
 void setup() {
+	// Set up inputs
+	pinMode(SPEED_PIN, INPUT);
+
 	// Set up the signal outputs
   pinMode(BUZZER, OUTPUT);
 	pinMode(LED, OUTPUT);
@@ -34,11 +41,15 @@ void setup() {
 	int bufferReader = 0;
 
 	// Start serial connection
-  Serial.begin(9600);
+  Serial.begin(BAUDRATE);
 	
 }
 
 void loop() {
+	int speedRead = analogRead(SPEED_PIN);
+	WPM = map(speedRead, 0, 1023, MIN_SPEED, MAX_SPEED);
+	t_unit = 60000.0/(50.0*WPM);
+
 	// Read the buffer if there is something to read
 	if (bufferReader<bufferWriter) {
 		char c = buffer[bufferReader];
@@ -105,10 +116,10 @@ float char_to_time(char c) {
 		time = - t_unit * intra;
 		break;
 	case 'j':
-		time = - t_unit * inter;
+		time = - t_unit * (inter-intra);
 		break;
 	case ' ':
-		time = - t_unit * space;
+		time = - t_unit * (space-inter-intra);
 		break;
 	default:
 		break;

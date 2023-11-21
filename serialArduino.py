@@ -15,7 +15,7 @@ from time import sleep
 # Arduino being able to notice and request lost packages
 
 class serialArduino:
-  def __init__(self, connect_mode='Auto', encoding='UTF-8'):
+  def __init__(self, connect_mode='Auto', encoding='utf-8'):
     self.available_ports = list_ports.comports()
     self.connect_mode = connect_mode
     self.encoding = encoding
@@ -27,13 +27,14 @@ class serialArduino:
       print(f"\nAvailable devices:\n{tabulate(self.available_ports, headers=['Name','Desc','Hwid'], tablefmt='orgtbl')}\n")
   
   
-  def initialize(self, port:str, baudrate:int=9600, timeout:float=1.) -> None:
+  def initialize(self, port:str, baudrate:int=9600, timeout:float=1., reboot_timer:float=2.) -> None:
     # Check if desired port exists
     port_names = [port.device for port in self.available_ports]
     if port not in port_names:
-      raise Exception(f"PORT ERROR: '{port}' is not a valid port name. Check serialArduino.ports for available ports")
+      raise Exception(f"PORT ERROR: '{port}' is not a valid port name. Check serialArduino.available_ports for available ports")
     
     self.serial = serial.Serial(port, baudrate, timeout=timeout)
+    sleep(reboot_timer)
     
     if self.serial.is_open:
       print(f"Serial connection to '{port}' has been initialized!")
@@ -41,25 +42,27 @@ class serialArduino:
       raise Exception(f"PORT ERROR: Connection to '{port}' is not open!")
   
   
-  def read(self):
+  def read(self) -> str:
     # Connection Check
     if self.serial is None:
       raise Exception("PORT ERROR: Serial is not connected to a port")
     elif self.serial.is_open == False:
       raise Exception("PORT ERROR: Serial connection is not open")
     
-    return self.serial.readline()
+    # Return the decoded message
+    return self.serial.readline().decode(encoding=self.encoding)
   
   
   # Writes a given message to arduino serial as a line
-  def write(self, msg: Union[str, int, float]):
+  def write(self, msg: Union[str, int, float]) -> int:
     # Connection Check
     if self.serial is None:
       raise Exception("PORT ERROR: Serial is not connected to a port")
     elif self.serial.is_open == False:
       raise Exception("PORT ERROR: Serial connection is not open")
-    self.serial.write(f'{msg}\n'.encode(encoding=self.encoding))
-  
+    # Returns the number of bytes written
+    return self.serial.write(f'{msg}\n'.encode(encoding=self.encoding))
+
   
   def close(self) -> None:
     if self.serial.is_open:

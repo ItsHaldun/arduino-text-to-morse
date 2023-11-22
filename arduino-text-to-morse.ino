@@ -1,7 +1,7 @@
 // Pinouts
 #define BUZZER 2						// Buzzer output signal pin
 #define LED 13
-#define SPEED_PIN A0		// Analog Potentiometer input	
+#define SPEED_PIN A3		// Analog Potentiometer input	
 
 // Farnsworth Timings
 #define dit 1 		// Units
@@ -12,7 +12,7 @@
 
 // Speed Control
 #define MIN_SPEED 1
-#define MAX_SPEED 50
+#define MAX_SPEED 40
 float WPM = 1.0;										// Words per minute (PARIS standard)
 float t_unit = 60000.0/(50.0*WPM);	// Miliseconds per unit
 
@@ -49,7 +49,7 @@ void setup() {
 
 void loop() {
 	int speedRead = analogRead(SPEED_PIN);
-	WPM = map(speedRead, 0, 1023, MIN_SPEED, MAX_SPEED);
+	WPM = map(speedRead, 0, 1023, MAX_SPEED, MIN_SPEED);
 	t_unit = 60000.0/(50.0*WPM);
 
 	// Check for interval
